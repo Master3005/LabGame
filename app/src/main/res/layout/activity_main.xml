@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:max="100"
-            android:progress="90"
+            android:progress="0"
             android:progressTint="@color/pink"
             android:thumb="@drawable/pig_icon3" />
 

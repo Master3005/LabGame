@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -19,7 +20,10 @@ public class MainActivity extends AppCompatActivity {
     TextView txtCoin, txtPlayer;
     Button btnStartRace, btnStartBet;
     SeekBar pig1, pig2, pig3;
-    CheckBox cbx1, cbx2, cbx3;
+    Boolean cbx1, cbx2, cbx3;
+    String txtMainCoin;
+    Boolean isWin = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,41 +42,44 @@ public class MainActivity extends AppCompatActivity {
                 pig3.setProgress(pig3.getProgress() + random.nextInt(10));
 
                 int chose = isChose();
-                if(pig1.getProgress() >= goal && chose == 1){
+                if (pig1.getProgress() >= goal && chose == 1) {
 
                     Toast.makeText(MainActivity.this, "PIG 1 WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
-                    this.cancel();
+                    this.onFinish();
                 }
 
-                if(pig2.getProgress() >= goal && chose == 2){
+                if (pig2.getProgress() >= goal && chose == 2) {
 
                     Toast.makeText(MainActivity.this, "PIG 2 WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
-                    this.cancel();
+                    this.onFinish();
                 }
 
-                if(pig3.getProgress() >= goal && chose == 3){
+                if (pig3.getProgress() >= goal && chose == 3) {
 
                     Toast.makeText(MainActivity.this, "PIG 3 WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
-                    this.cancel();
+                    this.onFinish();
                 }
 
-                if((pig1.getProgress() >= goal && chose != 1) || (pig2.getProgress() >= goal && chose != 2) || (pig3.getProgress() >= goal && chose != 3)){
+                if ((pig1.getProgress() >= goal && chose != 1) || (pig2.getProgress() >= goal && chose != 2) || (pig3.getProgress() >= goal && chose != 3)) {
 
                     Toast.makeText(MainActivity.this, "You lose", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
-                    this.cancel();
-                }
+                    isWin = false;
 
+                    this.onFinish();
+                }
 
 
             }
 
             @Override
             public void onFinish() {
-
+                checkWin(10);
+                backBetActivity();
+                this.cancel();
             }
         };
 
@@ -95,32 +102,48 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        btnStartBet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(this, MainActivity.class);
-            }
-        });
+//        btnStartBet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Intent intent = new Intent(this, MainActivity.class);
+//            }
+//        });
 
     }
 
+    private void checkWin(int betCoin) {
+        int result = Integer.parseInt(txtMainCoin);
+        if (isWin) {
+            result += betCoin;
+        } else {
+            result -= betCoin;
+        }
+        txtMainCoin = String.valueOf(result);
+    }
+
+    private void backBetActivity(){
+        Intent intent = new Intent(this, BetActivity.class);
+        intent.putExtra("txtCoin", txtMainCoin);
+        startActivity(intent);
+        finish();
+    }
 
 
-
-    private int isChose(){
-        if(cbx1.isChecked()){
+    private int isChose() {
+        if (cbx1) {
             return 1;
         }
-        if(cbx2.isChecked()){
+        if (cbx2) {
             return 2;
         }
-        if(cbx3.isChecked()) {
+        if (cbx3) {
             return 3;
         }
         return 0;
     }
 
-    private void Binding(){
+    private void Binding() {
+        Bundle extras = getIntent().getExtras();
         txtCoin = (TextView) findViewById(R.id.txtCoin);
         txtPlayer = (TextView) findViewById(R.id.txtplayer);
         btnStartRace = (Button) findViewById(R.id.btnStart);
@@ -128,9 +151,14 @@ public class MainActivity extends AppCompatActivity {
         pig1 = (SeekBar) findViewById(R.id.pig1);
         pig2 = (SeekBar) findViewById(R.id.pig2);
         pig3 = (SeekBar) findViewById(R.id.pig3);
-        cbx1 = (CheckBox) findViewById(R.id.checkBox);
-        cbx2 = (CheckBox) findViewById(R.id.checkBox2);
-        cbx3 = (CheckBox) findViewById(R.id.checkBox3);
+        if (extras != null) {
+            cbx1 = extras.getBoolean("cbx1");
+            cbx2 = extras.getBoolean("cbx2");
+            cbx3 = extras.getBoolean("cbx3");
+            txtMainCoin = extras.getString("txtCoin");
+            txtCoin.setText(txtMainCoin);
+        }
+
     }
 
 }
