@@ -18,11 +18,11 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     TextView txtCoin, txtPlayer;
-    Button btnStartRace, btnStartBet;
     SeekBar pig1, pig2, pig3;
     Boolean cbx1, cbx2, cbx3;
-    String txtMainCoin;
+    String txtMainCoin, betCoin;
     Boolean isWin = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Binding();
-        int chose = 1;
-
+        int chose = isChose();
         final CountDownTimer countDownTimer = new CountDownTimer(60000, 300) {
             @Override
             public void onTick(long l) {
@@ -44,14 +43,14 @@ public class MainActivity extends AppCompatActivity {
                 int chose = isChose();
                 if (pig1.getProgress() >= goal && chose == 1) {
 
-                    Toast.makeText(MainActivity.this, "PIG 1 WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Hoàng WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
                     this.onFinish();
                 }
 
                 if (pig2.getProgress() >= goal && chose == 2) {
 
-                    Toast.makeText(MainActivity.this, "PIG 2 WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Võ  WIN!!!\n You're the winner!", Toast.LENGTH_LONG).show();
                     txtPlayer.setText("You win");
                     this.onFinish();
                 }
@@ -77,37 +76,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                checkWin(10);
+                int coin = Integer.parseInt(betCoin);
+                checkWin(coin);
                 backBetActivity();
                 this.cancel();
             }
         };
-
-        btnStartRace.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (chose == 1) {
-                    if (Integer.parseInt(txtCoin.getText().toString()) <= 0) {
-                        Toast.makeText(MainActivity.this, "You lost all of your point\n This is new game", Toast.LENGTH_SHORT).show();
-                        txtCoin.setText("100");
-                    }
-                    btnStartRace.setVisibility(View.INVISIBLE);
-
-                    countDownTimer.start();
-
-                } else {
-                    Toast.makeText(MainActivity.this, "Please choose a pokemon", Toast.LENGTH_SHORT).show();
-                }
+        if (chose > 0) {
+            if (Integer.parseInt(txtCoin.getText().toString()) <= 0) {
+                Toast.makeText(MainActivity.this, "You lost all of your point\n This is new game", Toast.LENGTH_SHORT).show();
             }
-        });
+            countDownTimer.start();
 
-
-//        btnStartBet.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-////                Intent intent = new Intent(this, MainActivity.class);
-//            }
-//        });
+        } else {
+            Toast.makeText(MainActivity.this, "Please choose a pig", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -121,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         txtMainCoin = String.valueOf(result);
     }
 
-    private void backBetActivity(){
+    private void backBetActivity() {
         Intent intent = new Intent(this, BetActivity.class);
         intent.putExtra("txtCoin", txtMainCoin);
         startActivity(intent);
@@ -146,8 +129,6 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         txtCoin = (TextView) findViewById(R.id.txtCoin);
         txtPlayer = (TextView) findViewById(R.id.txtplayer);
-        btnStartRace = (Button) findViewById(R.id.btnStart);
-        btnStartBet = (Button) findViewById(R.id.button2);
         pig1 = (SeekBar) findViewById(R.id.pig1);
         pig2 = (SeekBar) findViewById(R.id.pig2);
         pig3 = (SeekBar) findViewById(R.id.pig3);
@@ -155,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
             cbx1 = extras.getBoolean("cbx1");
             cbx2 = extras.getBoolean("cbx2");
             cbx3 = extras.getBoolean("cbx3");
+            betCoin = extras.getString("edtBetCoin");
             txtMainCoin = extras.getString("txtCoin");
             txtCoin.setText(txtMainCoin);
         }
